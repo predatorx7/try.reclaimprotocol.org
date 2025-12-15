@@ -1,18 +1,24 @@
-import wordLogo from '../../assets/word_icon.svg'
-import simpleLogo from '/icon.svg'
+import './index.css';
+import { EvaluatorSection } from './components/EvaluatorSection';
+import { ClaimRequestSection } from './components/ClaimRequestSection';
 
 function Page() {
     return (
         <>
             <div className='container'>
-                <a href="https://reclaimprotocol.org" target="_blank">
-                    <img src={simpleLogo} alt="Reclaim Protocol logo" />
-                </a>
-                <a href="https://reclaimprotocol.org" target="_blank">
-                    <img src={wordLogo} alt="Reclaim Protocol logo" />
-                </a>
+                <h2 className="main-heading">Playground</h2>
+
+                <p className="subheading">
+                    Try evaluation or claim creation using Reclaim protocol attestor.
+                </p>
             </div>
-            <h1>Reclaim Protocol</h1>
+
+
+            <div className="section-container">
+                <EvaluatorSection title="JSON Path Evaluation" />
+                <EvaluatorSection title="XML Path Evaluation" />
+                <ClaimRequestSection />
+            </div>
         </>
     )
 }
