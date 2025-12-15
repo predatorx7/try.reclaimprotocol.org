@@ -1,10 +1,11 @@
+import './index.css';
 import wordLogo from '../../assets/word_icon.svg'
 import simpleLogo from '/icon.svg'
 
 function Page() {
     return (
         <>
-            <div>
+            <div className='container'>
                 <a href="https://reclaimprotocol.org" target="_blank">
                     <img src={simpleLogo} alt="Reclaim Protocol logo" />
                 </a>

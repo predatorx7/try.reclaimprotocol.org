@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./index.css";
+import StartVerificationButton from "../StartVerificationButton";
 
 interface Provider {
     httpProviderId: string;
@@ -12,7 +13,6 @@ export default function SelectProviderForVerification() {
     const [query, setQuery] = useState("");
     const [providers, setProviders] = useState<Provider[]>([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchProviders = async () => {
@@ -21,7 +21,6 @@ export default function SelectProviderForVerification() {
                 return;
             }
 
-            setIsLoading(true);
             try {
                 const res = await fetch(`https://api.reclaimprotocol.org/api/providers/active/paginated?pageKey=0&pageSize=10&searchQuery=${encodeURIComponent(query)}`);
                 const data = await res.json();
@@ -30,8 +29,6 @@ export default function SelectProviderForVerification() {
                 }
             } catch (error) {
                 console.error("Failed to fetch providers", error);
-            } finally {
-                setIsLoading(false);
             }
         };
 
@@ -45,9 +42,7 @@ export default function SelectProviderForVerification() {
     };
 
     const actionBar = <div className="action-bar">
-        <button className="btn-primary">
-            Start Verification
-        </button>
+        <StartVerificationButton providerId={query.trim()} />
     </div>
 
     return (
