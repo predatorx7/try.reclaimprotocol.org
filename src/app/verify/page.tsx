@@ -8,11 +8,14 @@ import { getErrorMessage } from "../../utils/error_message";
 import ResultsView from "../../components/results/Results";
 import { SessionIdLabel } from "../../components/SessionIdLabel";
 import { ProviderAppInfoTile } from "../../components/ProviderAppInfoTile";
+import { useLiveBackground } from "../../components/LiveBackground";
 
 type VerificationStatus = "starting" | "verifying" | "completed" | "error";
 
 function Page() {
   const [status, setStatus] = useState<VerificationStatus>("starting");
+  const { setStatus: setStatusLiveBackground } = useLiveBackground();
+
 
   const [search] = useSearchParams();
   const encodedRequest = search.get("request");
@@ -106,6 +109,10 @@ function Page() {
       setProviderId((proofRequest as any).providerId);
     }
   }, [proofRequest]);
+
+  useEffect(() => {
+    setStatusLiveBackground(proof ? 'success' : 'loading');
+  }, [proof, setStatusLiveBackground]);
 
   return (
     <div className="container">

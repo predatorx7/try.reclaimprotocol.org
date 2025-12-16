@@ -1,7 +1,14 @@
+import { useEffect } from "react";
 import wordLogo from "../assets/word_icon.svg";
+import { useLiveBackground } from "../components/LiveBackground";
 import SelectProviderForVerification from "../components/SelectProviderForVerification/index";
 
 function Page() {
+  const { setStatus } = useLiveBackground();
+  useEffect(() => {
+    setStatus('idle');
+  }, [setStatus]);
+
   return (
     <div className="container">
       <div className="logo-container">

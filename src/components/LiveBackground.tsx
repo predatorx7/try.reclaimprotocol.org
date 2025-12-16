@@ -76,8 +76,14 @@ export const LiveBackgroundProvider = ({
   children: React.ReactNode;
 }) => {
   const [status, setStatus] = useState<LiveBackgroundStatus>("idle");
+
+  const updateStatus = (newStatus: LiveBackgroundStatus) => {
+    if (newStatus === status) return;
+    setStatus(newStatus);
+  };
+
   return (
-    <liveBackgroundContext.Provider value={{ status, setStatus }}>
+    <liveBackgroundContext.Provider value={{ status, setStatus: updateStatus }}>
       {children}
     </liveBackgroundContext.Provider>
   );
