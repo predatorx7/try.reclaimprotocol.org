@@ -26,7 +26,7 @@ export function ClaimRequestSection() {
 
     return (
         <div className="card">
-            <h2>Section 3: Claim Request</h2>
+            <h2>Claim Verification</h2>
             <div className="input-group">
                 <label>Claim Request</label>
                 <textarea

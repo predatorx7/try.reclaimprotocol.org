@@ -4,6 +4,7 @@ import Root from "./Root";
 import AppPage from "./app/page";
 import ExpertPage from "./app/expert/page";
 import AttestorPage from "./app/attestor/page";
+import VerifyPage from "./app/verify/page";
 
 export const router = createBrowserRouter([
     {
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
         ErrorBoundary: RootErrorBoundary,
         children: [
             { index: true, Component: AppPage },
+            { path: 'verify', Component: VerifyPage },
             { path: 'expert', Component: ExpertPage },
             { path: 'attestor', Component: AttestorPage },
         ],

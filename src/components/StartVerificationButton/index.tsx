@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Reclaim } from "../../service/reclaim";
+import { useNavigate } from "react-router";
+import { showSnackbar } from "../Snackbar";
 
 export interface StartVerificationButtonProps {
     providerId: string;
@@ -6,16 +9,17 @@ export interface StartVerificationButtonProps {
 
 export default function StartVerificationButton({ providerId }: StartVerificationButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const startVerification = async (providerId: string) => {
         try {
-            await new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(true);
-                }, 2500);
-            });
+            const request = await Reclaim.createVerificationRequest(providerId);
+            const encodedRequest = encodeURIComponent(btoa(request));
+
+            navigate(`/verify?request=${encodedRequest}`)
         } catch (error) {
             console.error(error);
+            showSnackbar(`Could not request verification because ${typeof error === 'object' && error && 'message' in error ? error.message : error}`);
         }
     };
 
