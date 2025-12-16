@@ -30,7 +30,7 @@ function Page() {
   };
 
   return (
-    <div className="expert-container">
+    <div className="sub-container">
       <h2 className="main-heading">Expert options</h2>
 
       <p className="subheading">Configure advanced options for verification.</p>

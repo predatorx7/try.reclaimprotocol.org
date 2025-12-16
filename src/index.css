@@ -41,32 +41,26 @@
 /* 3. White Shimmer (Best on Dark Backgrounds) */
 .shimmer-white {
   /* Gradient: Dim White -> Bright White -> Dim White */
-  background-image: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0.4) 0%,
-    #ffffff 50%,
-    rgba(255, 255, 255, 0.4) 100%
-  );
+  background-image: linear-gradient(to right,
+      rgba(255, 255, 255, 0.4) 0%,
+      #ffffff 50%,
+      rgba(255, 255, 255, 0.4) 100%);
 }
 
 /* 4. Black Shimmer (Best on Light Backgrounds) */
 .shimmer-black {
   /* Gradient: Black -> Dark Grey/Silver -> Black */
-  background-image: linear-gradient(
-    to right,
-    #000000 0%,
-    #666666 50%,
-    #000000 100%
-  );
+  background-image: linear-gradient(to right,
+      #000000 0%,
+      #666666 50%,
+      #000000 100%);
 }
 
 .shimmer-blue {
-  background-image: linear-gradient(
-    to right,
-    rgba(0, 0, 255, 0.4) 0%,
-    #0000ee 50%,
-    rgba(0, 0, 255, 0.4) 100%
-  );
+  background-image: linear-gradient(to right,
+      rgba(0, 0, 255, 0.4) 0%,
+      #0000ee 50%,
+      rgba(0, 0, 255, 0.4) 100%);
 }
 
 body {
@@ -102,6 +96,20 @@ body {
   max-width: 100%;
   min-height: 100vh;
 }
+
+.sub-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 6rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 
 .logo-container {
   display: flex;
