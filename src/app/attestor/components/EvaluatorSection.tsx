@@ -47,7 +47,7 @@ export function EvaluatorSection({ title }: EvaluatorSectionProps) {
                     rows={4}
                 />
             </div>
-            <button onClick={handleEvaluate} disabled={loading}>
+            <button className="plg-button" onClick={handleEvaluate} disabled={loading}>
                 {loading ? 'Evaluating...' : 'Evaluate'}
             </button>
             {result && (

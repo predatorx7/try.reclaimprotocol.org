@@ -50,7 +50,7 @@
     border-color: transparent;
 }
 
-button {
+.plg-button {
     background: #0070f3;
     color: white;
     border: none;
@@ -61,11 +61,11 @@ button {
     transition: background 0.2s;
 }
 
-button:hover {
+.plg-button:hover {
     background: #0056b3;
 }
 
-button:disabled {
+.plg-button:disabled {
     background: #444;
     cursor: not-allowed;
 }

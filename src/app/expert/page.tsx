@@ -1,24 +1,26 @@
 import './index.css';
 import { useExpertContext } from '../../contexts/ExpertContext';
-import { useState } from 'react';
 import { showSnackbar } from '../../components/Snackbar';
 import { useNavigate } from 'react-router';
 
 function Page() {
     const { settings, updateSettings, saveSettings } = useExpertContext();
-    const [jsonError, setJsonError] = useState<string | null>(null);
+
     const navigate = useNavigate();
 
     const handleSave = () => {
-        setJsonError(null);
         // Validate JSON fields
         try {
             if (settings.parameters) JSON.parse(settings.parameters);
+        } catch (e) {
+            showSnackbar("Invalid JSON in Parameters field.");
+            return;
+        }
+
+        try {
             if (settings.context) JSON.parse(settings.context);
         } catch (e) {
-            setJsonError("Invalid JSON in Parameters or Context fields.");
-            // We could show a toast here, but for now simple alert/error text
-            alert("Invalid JSON in Parameters or Context fields.");
+            showSnackbar("Invalid JSON in Context field.");
             return;
         }
 
@@ -131,6 +133,18 @@ function Page() {
                     placeholder="Enter App Secret"
                     value={settings.appSecret}
                     onChange={(e) => updateSettings({ appSecret: e.target.value })}
+                />
+            </div>
+
+            <div className={`settings-card ${!settings.isExpertModeEnabled ? 'disabled' : ''}`}>
+                <div className="setting-title">Share Page URL</div>
+                <div className="setting-desc">URL to the page which decides where verification should happen.</div>
+                <input
+                    type="text"
+                    className="input-tile"
+                    placeholder="Enter Share Page URL"
+                    value={settings.sharePageUrl}
+                    onChange={(e) => updateSettings({ sharePageUrl: e.target.value })}
                 />
             </div>
 

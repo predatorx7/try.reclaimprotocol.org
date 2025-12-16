@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
   --font-family: 'Outfit', sans-serif;
@@ -63,12 +64,6 @@
       rgba(0, 0, 255, 0.4) 100%);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   font-family: var(--font-family);
   background: var(--bg-gradient);
@@ -101,6 +96,7 @@ body {
   width: 100%;
   padding: 2rem 1rem;
   max-width: 100%;
+  min-height: 100vh;
 }
 
 .logo-container {
@@ -139,10 +135,18 @@ body {
   line-height: 1.5;
 }
 
+.status-text {
+  font-size: 1.0rem;
+  color: #4B5563;
+  line-height: 1.5;
+}
+
 .disclaimer {
   font-size: 0.8rem;
   color: #4B5563;
-  margin-top: 2.5rem;
+  margin-top: auto;
+  margin-bottom: 0;
+  padding-bottom: 1rem;
   line-height: 1.5;
 }
 

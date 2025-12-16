@@ -9,6 +9,7 @@ export interface ExpertSettings {
     providerVersion: string;
     appId: string;
     appSecret: string;
+    sharePageUrl: string;
 }
 
 interface ExpertContextType {
@@ -25,7 +26,8 @@ const defaultSettings: ExpertSettings = {
     redirectUrl: '',
     providerVersion: '',
     appId: '',
-    appSecret: ''
+    appSecret: '',
+    sharePageUrl: ''
 };
 
 const ExpertContext = createContext<ExpertContextType | undefined>(undefined);

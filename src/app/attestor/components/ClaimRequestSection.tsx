@@ -36,7 +36,7 @@ export function ClaimRequestSection() {
                     rows={4}
                 />
             </div>
-            <button onClick={handleClaim} disabled={loading}>
+            <button className="plg-button" onClick={handleClaim} disabled={loading}>
                 {loading ? 'Processing...' : 'Start Claim'}
             </button>
             {claimResult && (
