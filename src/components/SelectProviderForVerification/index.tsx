@@ -15,25 +15,34 @@ export default function SelectProviderForVerification() {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        const fetchProviders = async () => {
-            if (!query.trim()) {
-                setProviders([]);
-                return;
-            }
+        const abortController = new AbortController();
 
+        const fetchProviders = async () => {
+            let isVerifiedQuery = '';
+            if (!query.trim()) {
+                isVerifiedQuery = '&isVerified=true';
+            }
             try {
-                const res = await fetch(`https://api.reclaimprotocol.org/api/providers/active/paginated?pageKey=0&pageSize=10&searchQuery=${encodeURIComponent(query)}`);
+                const res = await fetch(`https://api.reclaimprotocol.org/api/providers/active/paginated?pageKey=0&pageSize=20&searchQuery=${encodeURIComponent(query.trim())}${isVerifiedQuery}`, {
+                    signal: abortController.signal,
+                });
                 const data = await res.json();
                 if (data.providers) {
                     setProviders(data.providers);
                 }
             } catch (error) {
+                if (abortController.signal.aborted) return;
+
                 console.error("Failed to fetch providers", error);
             }
         };
 
         const timeoutId = setTimeout(fetchProviders, 300);
-        return () => clearTimeout(timeoutId);
+
+        return () => {
+            clearTimeout(timeoutId);
+            abortController.abort();
+        };
     }, [query]);
 
     const handleSelect = (id: string) => {
@@ -51,7 +60,7 @@ export default function SelectProviderForVerification() {
                 <div className="input-wrapper">
                     <input
                         type="text"
-                        placeholder="Enter a provider ID"
+                        placeholder="Search for a data provider"
                         className="input-field"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -71,8 +80,11 @@ export default function SelectProviderForVerification() {
                                         className="result-item"
                                         onClick={() => handleSelect(provider.httpProviderId)}
                                     >
-                                        <div className="result-name">{provider.name}</div>
-                                        <div className="result-desc">{provider.description}</div>
+                                        <img src={provider.logoUrl} alt={provider.name} className="result-icon" />
+                                        <div className="result-info">
+                                            <div className="result-name">{provider.name}</div>
+                                            <div className="result-desc">{provider.description}</div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

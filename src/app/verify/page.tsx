@@ -81,13 +81,13 @@ function Page() {
                     (() => {
                         switch (status) {
                             case 'starting':
-                                return <p>Starting verification...</p>;
+                                return 'Starting verification...';
                             case 'verifying':
-                                return <p>Verifying...</p>;
+                                return 'Verifying...';
                             case 'completed':
-                                return <p>Verification completed successfully</p>;
+                                return 'Verification completed successfully';
                             case 'error':
-                                return <p>Something went wrong</p>;
+                                return 'Something went wrong';
                         }
                     })()
                 }
