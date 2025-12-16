@@ -38,6 +38,13 @@ export const useExpertContext = () => {
   return context;
 };
 
+export function useSelectFromExpertSettings<T>(select: (settings: ExpertSettings) => T): T {
+  const { settings } = useExpertContext();
+  if (!settings.isExpertModeEnabled) return select(defaultSettings);
+
+  return select(settings);
+}
+
 export const ExpertContextProvider = ({
   children,
 }: {

@@ -9,6 +9,7 @@ import { SessionIdLabel } from "../../components/SessionIdLabel";
 import { ProviderAppInfoTile } from "../../components/ProviderAppInfoTile";
 import { useLiveBackground } from "../../components/LiveBackground";
 import WordLogo from "../../components/logo/WordLogo";
+import { useSelectFromExpertSettings } from "../../contexts/ExpertContext";
 
 type VerificationStatus = "starting" | "verifying" | "completed" | "error";
 
@@ -18,6 +19,8 @@ function Page() {
 
   // Ignore this section of the code, it's just for demo purposes.
   // ==== IGNORE START ====
+  const autoTriggerFlow = useSelectFromExpertSettings((settings) => settings.autoTriggerFlow);
+
   useEffect(() => {
     setStatusLiveBackground(proof ? "success" : "loading");
   }, [setStatusLiveBackground]);
@@ -80,7 +83,9 @@ function Page() {
   const startVerificationJourney = async (
     proofRequest: ReclaimProofRequest,
   ): Promise<void> => {
-    launchReclaimFlow(proofRequest);
+    if (autoTriggerFlow) {
+      launchReclaimFlow(proofRequest);
+    }
 
     // If you are not using a custom callback, then you can use this function on your frontend
     // to receive proofs (or fatal error) when verification is completed
