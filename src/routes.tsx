@@ -7,15 +7,15 @@ import AttestorPage from "./app/attestor/page";
 import VerifyPage from "./app/verify/page";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        Component: Root,
-        ErrorBoundary: RootErrorBoundary,
-        children: [
-            { index: true, Component: AppPage },
-            { path: 'verify', Component: VerifyPage },
-            { path: 'expert', Component: ExpertPage },
-            { path: 'attestor', Component: AttestorPage },
-        ],
-    },
+  {
+    path: "/",
+    Component: Root,
+    ErrorBoundary: RootErrorBoundary,
+    children: [
+      { index: true, Component: AppPage },
+      { path: "verify", Component: VerifyPage },
+      { path: "expert", Component: ExpertPage },
+      { path: "attestor", Component: AttestorPage },
+    ],
+  },
 ]);

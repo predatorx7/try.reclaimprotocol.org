@@ -1,22 +1,21 @@
-
 /**
  * @param {number} message - The message that should be shown to the user in the snackbar
  * @param {number} duration - The duration of the display of snackbar message in seconds
  */
 export function showSnackbar(message: string, duration: number = 3000) {
-    // Remove any existing snackbar
-    const existingSnackbar = document.getElementById("reclaim-snackbar");
-    if (existingSnackbar) {
-        existingSnackbar.remove();
-    }
+  // Remove any existing snackbar
+  const existingSnackbar = document.getElementById("reclaim-snackbar");
+  if (existingSnackbar) {
+    existingSnackbar.remove();
+  }
 
-    // Create snackbar element
-    const snackbar = document.createElement("div");
-    snackbar.id = "reclaim-snackbar";
-    snackbar.textContent = message;
+  // Create snackbar element
+  const snackbar = document.createElement("div");
+  snackbar.id = "reclaim-snackbar";
+  snackbar.textContent = message;
 
-    // Apply styles
-    snackbar.style.cssText = `
+  // Apply styles
+  snackbar.style.cssText = `
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -35,21 +34,21 @@ export function showSnackbar(message: string, duration: number = 3000) {
     text-align: center;
   `;
 
-    // Add to body
-    document.body.appendChild(snackbar);
+  // Add to body
+  document.body.appendChild(snackbar);
 
-    // Trigger animation
-    setTimeout(() => {
-        snackbar.style.opacity = "1";
-    }, 10);
+  // Trigger animation
+  setTimeout(() => {
+    snackbar.style.opacity = "1";
+  }, 10);
 
-    // Remove after duration
+  // Remove after duration
+  setTimeout(() => {
+    snackbar.style.opacity = "0";
     setTimeout(() => {
-        snackbar.style.opacity = "0";
-        setTimeout(() => {
-            if (snackbar.parentNode) {
-                snackbar.parentNode.removeChild(snackbar);
-            }
-        }, 300);
-    }, duration);
+      if (snackbar.parentNode) {
+        snackbar.parentNode.removeChild(snackbar);
+      }
+    }, 300);
+  }, duration);
 }

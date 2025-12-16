@@ -1,203 +1,260 @@
-import { useSearchParams } from 'react-router'
-import wordLogo from '../../assets/word_icon.svg'
-import { useEffect, useState } from 'react';
-import { Reclaim } from '../../service/reclaim';
-import type { Proof, ReclaimProofRequest } from '@reclaimprotocol/js-sdk';
-import { showSnackbar } from '../../components/Snackbar';
-import { getErrorMessage } from '../../utils/error_message';
-import ResultsView from '../../components/results/Results';
-import { SessionIdLabel } from '../../components/SessionIdLabel';
-import { ProviderAppInfoTile } from '../../components/ProviderAppInfoTile';
+import { useSearchParams } from "react-router";
+import wordLogo from "../../assets/word_icon.svg";
+import { useEffect, useState } from "react";
+import { Reclaim } from "../../service/reclaim";
+import type { Proof, ReclaimProofRequest } from "@reclaimprotocol/js-sdk";
+import { showSnackbar } from "../../components/Snackbar";
+import { getErrorMessage } from "../../utils/error_message";
+import ResultsView from "../../components/results/Results";
+import { SessionIdLabel } from "../../components/SessionIdLabel";
+import { ProviderAppInfoTile } from "../../components/ProviderAppInfoTile";
 
-type VerificationStatus = 'starting' | 'verifying' | 'completed' | 'error';
+type VerificationStatus = "starting" | "verifying" | "completed" | "error";
 
 function Page() {
-    const [status, setStatus] = useState<VerificationStatus>('starting');
+  const [status, setStatus] = useState<VerificationStatus>("starting");
 
-    const [search] = useSearchParams();
-    const encodedRequest = search.get('request');
+  const [search] = useSearchParams();
+  const encodedRequest = search.get("request");
 
-    const [proofRequest, setProofRequest] = useState<ReclaimProofRequest | null>(null);
-    // for copying
-    const [verificationLink, setVerificationLink] = useState<string>('');
-    const [proof, setProof] = useState<Proof[] | null>(null);
-    const [applicationId, setApplicationId] = useState<string>('');
-    const [providerId, setProviderId] = useState<string>('');
+  const [proofRequest, setProofRequest] = useState<ReclaimProofRequest | null>(
+    null,
+  );
+  // for copying
+  const [verificationLink, setVerificationLink] = useState<string>("");
+  const [proof, setProof] = useState<Proof[] | null>(null);
+  const [applicationId, setApplicationId] = useState<string>("");
+  const [providerId, setProviderId] = useState<string>("");
 
-    useEffect(() => {
-        if (!encodedRequest) return;
-        Reclaim.restoreVerificationRequest(encodedRequest).then(setProofRequest).catch((error) => {
-            console.error(error);
-            showSnackbar(`Could not request verification because ${getErrorMessage(error)}`);
-        });
-    }, [encodedRequest]);
+  useEffect(() => {
+    if (!encodedRequest) return;
+    Reclaim.restoreVerificationRequest(encodedRequest)
+      .then(setProofRequest)
+      .catch((error) => {
+        console.error(error);
+        showSnackbar(
+          `Could not request verification because ${getErrorMessage(error)}`,
+        );
+      });
+  }, [encodedRequest]);
 
-    const launchReclaimFlow = async (proofRequest: ReclaimProofRequest): Promise<void> => {
-        proofRequest.triggerReclaimFlow().catch((error) => {
-            console.error('Failed to trigger reclaim flow', error);
-            setStatus('error');
-        });
+  const launchReclaimFlow = async (
+    proofRequest: ReclaimProofRequest,
+  ): Promise<void> => {
+    proofRequest.triggerReclaimFlow().catch((error) => {
+      console.error("Failed to trigger reclaim flow", error);
+      setStatus("error");
+    });
+  };
+
+  const startVerificationJourney = async (
+    proofRequest: ReclaimProofRequest,
+  ): Promise<void> => {
+    launchReclaimFlow(proofRequest);
+
+    proofRequest
+      .startSession({
+        onSuccess: (proof) => {
+          console.info({ proof });
+          showSnackbar(`Verification completed successfully`);
+          if (Array.isArray(proof)) {
+            setProof(proof);
+          } else if (typeof proof === "string") {
+            // For backwards compatibility
+            setProof(JSON.parse(proof));
+          } else {
+            // For backwards compatibility
+            setProof([proof as Proof]);
+          }
+          setStatus("completed");
+        },
+        onError: (error) => {
+          console.error(error);
+          showSnackbar(
+            `Something went wrong because ${getErrorMessage(error)}`,
+          );
+        },
+      })
+      .catch((error) => {
+        console.error("Failed to get session information", error);
+        setStatus("error");
+      });
+
+    proofRequest
+      .getRequestUrl()
+      .then(setVerificationLink)
+      .catch((error) => {
+        console.error("Failed to get verification link", error);
+        setStatus("error");
+      });
+
+    setStatus("verifying");
+  };
+
+  useEffect(() => {
+    if (!proofRequest) return;
+    startVerificationJourney(proofRequest).catch((error) => {
+      console.error(error);
+      showSnackbar(
+        `Could not request verification because ${getErrorMessage(error)}`,
+      );
+    });
+    if ("applicationId" in proofRequest) {
+      setApplicationId((proofRequest as any).applicationId);
     }
-
-    const startVerificationJourney = async (proofRequest: ReclaimProofRequest): Promise<void> => {
-        launchReclaimFlow(proofRequest);
-
-        proofRequest.startSession({
-            onSuccess: (proof) => {
-                console.info({ proof });
-                showSnackbar(`Verification completed successfully`);
-                if (Array.isArray(proof)) {
-                    setProof(proof);
-                } else if (typeof proof === 'string') {
-                    // For backwards compatibility
-                    setProof(JSON.parse(proof));
-                } else {
-                    // For backwards compatibility
-                    setProof([proof as Proof]);
-                }
-                setStatus('completed');
-            },
-            onError: (error) => {
-                console.error(error);
-                showSnackbar(`Something went wrong because ${getErrorMessage(error)}`);
-            },
-        }).catch((error) => {
-            console.error('Failed to get session information', error);
-            setStatus('error');
-        });
-
-        proofRequest.getRequestUrl().then(setVerificationLink).catch((error) => {
-            console.error('Failed to get verification link', error);
-            setStatus('error');
-        });
-
-        setStatus('verifying');
+    if ("providerId" in proofRequest) {
+      setProviderId((proofRequest as any).providerId);
     }
+  }, [proofRequest]);
 
-    useEffect(() => {
-        if (!proofRequest) return;
-        startVerificationJourney(proofRequest).catch((error) => {
-            console.error(error);
-            showSnackbar(`Could not request verification because ${getErrorMessage(error)}`);
-        });
-        if ('applicationId' in proofRequest) {
-            setApplicationId((proofRequest as any).applicationId);
-        }
-        if ('providerId' in proofRequest) {
-            setProviderId((proofRequest as any).providerId);
-        }
-    }, [proofRequest]);
+  return (
+    <div className="container">
+      <div className="logo-container">
+        <a href="https://reclaimprotocol.org" target="_blank" rel="noreferrer">
+          <img
+            src={wordLogo}
+            alt="Reclaim Protocol"
+            className="logo-icon"
+            style={{ height: "40px", width: "auto" }}
+          />
+        </a>
+      </div>
 
-    return (
-        <div className="container">
-            <div className="logo-container">
-                <a href="https://reclaimprotocol.org" target="_blank" rel="noreferrer">
-                    <img src={wordLogo} alt="Reclaim Protocol" className="logo-icon" style={{ height: '40px', width: 'auto' }} />
-                </a>
-            </div>
+      <h1 className="main-heading">Reclaim Protocol Demo</h1>
 
-            <h1 className="main-heading">Reclaim Protocol Demo</h1>
+      <ProviderAppInfoTile
+        applicationId={applicationId}
+        providerId={providerId}
+      />
 
-            <ProviderAppInfoTile applicationId={applicationId} providerId={providerId} />
+      <SessionIdLabel
+        sessionId={proofRequest ? proofRequest.getSessionId() : "..."}
+      />
 
-            <SessionIdLabel sessionId={proofRequest ? proofRequest.getSessionId() : '...'} />
+      {proof ? undefined : <StatusMessage status={status} />}
 
-            {proof ? undefined : <StatusMessage status={status} />}
+      <VerificationActions
+        hasProof={!!proof}
+        verificationLink={verificationLink}
+        onLaunch={() => proofRequest && launchReclaimFlow(proofRequest)}
+      />
 
-            <VerificationActions
-                hasProof={!!proof}
-                verificationLink={verificationLink}
-                onLaunch={() => proofRequest && launchReclaimFlow(proofRequest)}
-            />
+      <ResultsView className="mb-6" proof={proof} />
 
-            <ResultsView className="mb-6" proof={proof} />
-
-            <p className="disclaimer">
-                Proofs generated by Reclaim Protocol are secure and private. <a href="https://docs.reclaimprotocol.org" className="link" target="_blank" rel="noreferrer">Learn More</a>
-            </p>
-        </div>
-    )
+      <p className="disclaimer">
+        Proofs generated by Reclaim Protocol are secure and private.{" "}
+        <a
+          href="https://docs.reclaimprotocol.org"
+          className="link"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Learn More
+        </a>
+      </p>
+    </div>
+  );
 }
 
 const StatusMessage = ({ status }: { status: VerificationStatus }) => {
-    return (
-        <p className="status-text mt-2 shimmer">
-            {
-                (() => {
-                    switch (status) {
-                        case 'starting':
-                            return 'Starting verification...';
-                        case 'verifying':
-                            return 'Verifying...';
-                        case 'completed':
-                            return 'Verification completed successfully';
-                        case 'error':
-                            return 'Something went wrong';
-                    }
-                })()
-            }
-        </p>
-    );
+  return (
+    <p className="status-text mt-2 shimmer">
+      {(() => {
+        switch (status) {
+          case "starting":
+            return "Starting verification...";
+          case "verifying":
+            return "Verifying...";
+          case "completed":
+            return "Verification completed successfully";
+          case "error":
+            return "Something went wrong";
+        }
+      })()}
+    </p>
+  );
 };
 
 const VerificationActions = ({
-    verificationLink,
-    onLaunch,
-    hasProof
+  verificationLink,
+  onLaunch,
+  hasProof,
 }: {
-    verificationLink: string;
-    onLaunch: () => void;
-    hasProof: boolean;
+  verificationLink: string;
+  onLaunch: () => void;
+  hasProof: boolean;
 }) => {
-    const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const onCopy = async (): Promise<void> => {
-        if (!verificationLink) {
-            return;
-        }
-
-        try {
-            navigator.clipboard.writeText(verificationLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (error) {
-            console.error('Failed to copy verification link:', error);
-        }
+  const onCopy = async (): Promise<void> => {
+    if (!verificationLink) {
+      return;
     }
 
-    return (
-        <div className="flex flex-row items-center justify-center gap-4 mt-6 pt-2">
-            <button
-                className="flex items-center justify-center gap-1.5 bg-transparent border border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800 rounded-lg transition-all font-medium text-xs"
-                style={{ padding: '4px 12px', minWidth: '120px' }}
-                onClick={onCopy}
-            >
-                {copied ? (
-                    <>
-                        <span>Copied Link</span>
-                        <svg className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </>
-                ) : (
-                    <>
-                        <span>Copy Link</span>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                    </>
-                )}
-            </button>
+    try {
+      navigator.clipboard.writeText(verificationLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy verification link:", error);
+    }
+  };
 
-            {hasProof ? undefined : <button
-                className="bg-transparent border border-blue-600 text-blue-600 hover:border-blue-700 hover:text-blue-700 rounded-lg transition-all font-medium text-xs"
-                style={{ padding: '4px 12px', minWidth: '120px' }}
-                onClick={onLaunch}
+  return (
+    <div className="flex flex-row items-center justify-center gap-4 mt-6 pt-2">
+      <button
+        className="flex items-center justify-center gap-1.5 bg-transparent border border-gray-600 text-gray-600 hover:border-gray-800 hover:text-gray-800 rounded-lg transition-all font-medium text-xs"
+        style={{ padding: "4px 12px", minWidth: "120px" }}
+        onClick={onCopy}
+      >
+        {copied ? (
+          <>
+            <span>Copied Link</span>
+            <svg
+              className="w-3.5 h-3.5 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
             >
-                <span>Launch Again</span>
-            </button>}
-        </div>
-    );
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </>
+        ) : (
+          <>
+            <span>Copy Link</span>
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          </>
+        )}
+      </button>
+
+      {hasProof ? undefined : (
+        <button
+          className="bg-transparent border border-blue-600 text-blue-600 hover:border-blue-700 hover:text-blue-700 rounded-lg transition-all font-medium text-xs"
+          style={{ padding: "4px 12px", minWidth: "120px" }}
+          onClick={onLaunch}
+        >
+          <span>Launch Again</span>
+        </button>
+      )}
+    </div>
+  );
 };
 
-export default Page
+export default Page;

@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --font-family: 'Outfit', sans-serif;
-  --primary-color: #0000FF;
+  --font-family: "Outfit", sans-serif;
+  --primary-color: #0000ff;
   /* Bright Blue */
   --text-color: #020202;
-  --bg-gradient: linear-gradient(135deg, #E0E7FF 0%, #F5F3FF 100%);
+  --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f5f3ff 100%);
 }
 
 /* 1. Define the animation keyframes */
@@ -19,7 +19,6 @@
     background-position: 200% center;
   }
 }
-
 
 /* 2. Shared Shimmer Properties */
 .shimmer-white,
@@ -42,26 +41,32 @@
 /* 3. White Shimmer (Best on Dark Backgrounds) */
 .shimmer-white {
   /* Gradient: Dim White -> Bright White -> Dim White */
-  background-image: linear-gradient(to right,
-      rgba(255, 255, 255, 0.4) 0%,
-      #ffffff 50%,
-      rgba(255, 255, 255, 0.4) 100%);
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.4) 0%,
+    #ffffff 50%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
 }
 
 /* 4. Black Shimmer (Best on Light Backgrounds) */
 .shimmer-black {
   /* Gradient: Black -> Dark Grey/Silver -> Black */
-  background-image: linear-gradient(to right,
-      #000000 0%,
-      #666666 50%,
-      #000000 100%);
+  background-image: linear-gradient(
+    to right,
+    #000000 0%,
+    #666666 50%,
+    #000000 100%
+  );
 }
 
 .shimmer-blue {
-  background-image: linear-gradient(to right,
-      rgba(0, 0, 255, 0.4) 0%,
-      #0000EE 50%,
-      rgba(0, 0, 255, 0.4) 100%);
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 255, 0.4) 0%,
+    #0000ee 50%,
+    rgba(0, 0, 255, 0.4) 100%
+  );
 }
 
 body {
@@ -74,7 +79,6 @@ body {
   color: var(--text-color);
   -webkit-font-smoothing: antialiased;
 }
-
 
 #root {
   width: 100%;
@@ -123,27 +127,27 @@ body {
   font-weight: 800;
   margin-bottom: 1rem;
   letter-spacing: -0.03em;
-  color: #0000EE;
+  color: #0000ee;
   /* Matching the deep blue in the screenshot */
 }
 
 .subheading {
-  font-size: 1.0rem;
-  color: #4B5563;
+  font-size: 1rem;
+  color: #4b5563;
   margin-top: 0.1rem;
   margin-bottom: 0.5rem;
   line-height: 1.5;
 }
 
 .status-text {
-  font-size: 1.0rem;
-  color: #4B5563;
+  font-size: 1rem;
+  color: #4b5563;
   line-height: 1.5;
 }
 
 .disclaimer {
   font-size: 0.8rem;
-  color: #4B5563;
+  color: #4b5563;
   margin-top: auto;
   margin-bottom: 0;
   padding-bottom: 1rem;
@@ -151,7 +155,7 @@ body {
 }
 
 .link {
-  color: #0000EE;
+  color: #0000ee;
   text-decoration: underline;
   font-weight: 500;
   cursor: pointer;
@@ -159,7 +163,7 @@ body {
 
 .divider {
   font-size: 1rem;
-  color: #6B7280;
+  color: #6b7280;
   margin: 1.5rem 0;
   position: relative;
   width: 100%;
@@ -187,19 +191,23 @@ body {
   font-size: 1.1rem;
   outline: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .input-field:focus {
-  border-color: #0000EE;
-  box-shadow: 0 0 0 3px rgba(0, 0, 238, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-color: #0000ee;
+  box-shadow:
+    0 0 0 3px rgba(0, 0, 238, 0.1),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
   width: auto;
   min-width: 230px;
   max-width: 100%;
-  background-color: #0000EE;
+  background-color: #0000ee;
   color: white;
   border: none;
   border-radius: 12px;
@@ -208,11 +216,13 @@ body {
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.1s ease, background-color 0.2s ease;
+  transition:
+    transform 0.1s ease,
+    background-color 0.2s ease;
 }
 
 .btn-primary:hover {
-  background-color: #0000CC;
+  background-color: #0000cc;
 }
 
 .btn-primary:disabled {
@@ -240,7 +250,7 @@ body {
   font-family: var(--font-family);
   font-size: 0.95rem;
   font-weight: 500;
-  color: #4B5563;
+  color: #4b5563;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -249,22 +259,22 @@ body {
 }
 
 .nav-link:hover {
-  color: #0000EE;
+  color: #0000ee;
 }
 
 .nav-link.active {
-  color: #0000EE;
+  color: #0000ee;
   font-weight: 600;
 }
 
 .nav-link.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #0000EE;
+  background-color: #0000ee;
   border-radius: 2px;
 }
 
