@@ -12,7 +12,7 @@ This demonstrates the integration of Reclaim Protocol's JS SDK for managing user
 ## For developers 🤖
 
 1. Read the code of [the start verification button](src/components/StartVerificationButton/index.tsx). This shows how
-verification request should be created.
+   verification request should be created.
 2. [Verify page](src/app/verify/page.tsx) shows how reclaim verification request can be used to start verification on frontend.
 3. [YourBackendUsingReclaim](src/service/reclaim.ts) shows how Reclaim SDK should be used to create, or modify requests and verify, validate the proofs.
 

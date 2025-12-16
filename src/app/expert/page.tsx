@@ -4,7 +4,7 @@ import { showSnackbar } from "../../components/Snackbar";
 import { useNavigate } from "react-router";
 
 function Page() {
-  const { settings, updateSettings, saveSettings } = useExpertContext();
+  const { settings, updateSettings, saveSettings, resetSettings } = useExpertContext();
 
   const navigate = useNavigate();
 
@@ -27,6 +27,11 @@ function Page() {
     saveSettings();
     showSnackbar("Settings saved!");
     navigate("/");
+  };
+
+  const handleReset = () => {
+    resetSettings();
+    showSnackbar("Settings reset!");
   };
 
   return (
@@ -60,13 +65,36 @@ function Page() {
         className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
       >
         <div className="setting-title">Auto Trigger Flow</div>
-        <div className="setting-desc">Starts the flow automatically when the verify page loads (applies to this demo only).</div>
+        <div className="setting-desc">
+          Starts the flow automatically when the verify page loads (applies to
+          this demo only).
+        </div>
         <label className="switch">
           <input
             type="checkbox"
             checked={settings.autoTriggerFlow}
             onChange={(e) =>
               updateSettings({ autoTriggerFlow: e.target.checked })
+            }
+          />
+          <span className="slider"></span>
+        </label>
+      </div>
+
+      <div
+        className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
+      >
+        <div className="setting-title">Use deferred deep links flow</div>
+        <div className="setting-desc">
+          Use deferred deep links flow for verification when doing verifications
+          on phone.
+        </div>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={settings.useDeferredDeepLinksFlow}
+            onChange={(e) =>
+              updateSettings({ useDeferredDeepLinksFlow: e.target.checked })
             }
           />
           <span className="slider"></span>
@@ -149,7 +177,10 @@ function Page() {
         className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
       >
         <div className="setting-title">Provider Version</div>
-        <div className="setting-desc">Specific provider version to use. Leaving this blank will use the latest version.</div>
+        <div className="setting-desc">
+          Specific provider version to use. Leaving this blank will use the
+          latest version.
+        </div>
         <input
           type="text"
           className="input-tile"
@@ -190,6 +221,9 @@ function Page() {
       <div className="mb-10"></div>
 
       <div className="save-btn-container">
+        <button className="btn-secondary me-2" onClick={handleReset}>
+          Reset Settings
+        </button>
         <button className="btn-primary" onClick={handleSave}>
           Save Settings
         </button>

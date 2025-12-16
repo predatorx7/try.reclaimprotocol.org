@@ -5,7 +5,10 @@ export default function WordLogo() {
   const isMobile = !useIsLargeScreen();
 
   return (
-    <div className="logo-container" style={{ marginTop: !isMobile ? "15vh" : "4vh" }}>
+    <div
+      className="logo-container"
+      style={{ marginTop: !isMobile ? "15vh" : "4vh" }}
+    >
       <a href="https://reclaimprotocol.org" target="_blank" rel="noreferrer">
         <img
           src={wordLogo}

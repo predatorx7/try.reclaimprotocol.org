@@ -19,7 +19,9 @@ function Page() {
 
   // Ignore this section of the code, it's just for demo purposes.
   // ==== IGNORE START ====
-  const autoTriggerFlow = useSelectFromExpertSettings((settings) => settings.autoTriggerFlow);
+  const autoTriggerFlow = useSelectFromExpertSettings(
+    (settings) => settings.autoTriggerFlow,
+  );
 
   useEffect(() => {
     setStatusLiveBackground(proof ? "success" : "loading");

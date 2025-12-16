@@ -2,7 +2,9 @@ import {
   ReclaimProofRequest,
   verifyProof,
   type Proof,
+  isMobileDevice,
 } from "@reclaimprotocol/js-sdk";
+import type { ExpertSettings } from "./expert";
 
 export const YourBackendUsingReclaim = {
   /**
@@ -82,5 +84,62 @@ export const YourBackendUsingReclaim = {
     }
 
     return proofs;
+  },
+
+  /**
+   * Advanced: Create verification request with advanced options to customize
+   * verification
+   *
+   * @deprecated This should happen on your backend
+   *
+   * @param providerId - The unique identifier of Reclaim's data provider
+   * @returns
+   */
+  createVerificationRequestAsExpert: async (
+    providerId: string,
+    expertSettings: ExpertSettings,
+  ) => {
+    const reclaimAppId =
+      expertSettings.appId || import.meta.env.VITE_RECLAIM_APP_ID || "";
+    const reclaimAppSecret =
+      expertSettings.appSecret || import.meta.env.VITE_RECLAIM_APP_SECRET || "";
+
+    const proofRequest = await ReclaimProofRequest.init(
+      reclaimAppId,
+      reclaimAppSecret,
+      providerId,
+      {
+        providerVersion: expertSettings.providerVersion
+          ? expertSettings.providerVersion
+          : undefined,
+        customSharePageUrl: expertSettings.sharePageUrl
+          ? expertSettings.sharePageUrl
+          : undefined,
+        launchOptions: {
+          canUseDeferredDeepLinksFlow:
+            isMobileDevice() && expertSettings.useDeferredDeepLinksFlow
+              ? expertSettings.useDeferredDeepLinksFlow
+              : undefined,
+        },
+      },
+    );
+
+    if (expertSettings.callbackUrl) {
+      proofRequest.setAppCallbackUrl(expertSettings.callbackUrl, true);
+    }
+
+    if (expertSettings.redirectUrl) {
+      proofRequest.setRedirectUrl(expertSettings.redirectUrl);
+    }
+
+    if (expertSettings.context) {
+      proofRequest.setJsonContext(JSON.parse(expertSettings.context));
+    }
+
+    if (expertSettings.parameters) {
+      proofRequest.setParams(JSON.parse(expertSettings.parameters));
+    }
+
+    return proofRequest.toJsonString();
   },
 };

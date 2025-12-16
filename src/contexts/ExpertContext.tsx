@@ -11,6 +11,7 @@ interface ExpertContextType {
   settings: ExpertSettings;
   updateSettings: (newSettings: Partial<ExpertSettings>) => void;
   saveSettings: () => void;
+  resetSettings: () => void;
 }
 
 const defaultSettings: ExpertSettings = {
@@ -24,6 +25,7 @@ const defaultSettings: ExpertSettings = {
   appId: "",
   appSecret: "",
   sharePageUrl: "",
+  useDeferredDeepLinksFlow: true,
 };
 
 const ExpertContext = createContext<ExpertContextType | undefined>(undefined);
@@ -38,7 +40,9 @@ export const useExpertContext = () => {
   return context;
 };
 
-export function useSelectFromExpertSettings<T>(select: (settings: ExpertSettings) => T): T {
+export function useSelectFromExpertSettings<T>(
+  select: (settings: ExpertSettings) => T,
+): T {
   const { settings } = useExpertContext();
   if (!settings.isExpertModeEnabled) return select(defaultSettings);
 
@@ -74,8 +78,13 @@ export const ExpertContextProvider = ({
     console.log("Expert settings saved:", settings);
   };
 
+  const resetSettings = () => {
+    setSettings(defaultSettings);
+    localStorage.removeItem("reclaim_expert_settings");
+  };
+
   return (
-    <ExpertContext.Provider value={{ settings, updateSettings, saveSettings }}>
+    <ExpertContext.Provider value={{ settings, updateSettings, saveSettings, resetSettings }}>
       {children}
     </ExpertContext.Provider>
   );
