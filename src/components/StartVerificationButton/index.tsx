@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Reclaim } from "../../service/reclaim";
+import { YourBackendUsingReclaim } from "../../service/reclaim";
 import { useNavigate } from "react-router";
 import { showSnackbar } from "../Snackbar";
 
@@ -15,9 +15,21 @@ export default function StartVerificationButton({
 
   const startVerification = async (providerId: string) => {
     try {
-      const request = await Reclaim.createVerificationRequest(providerId);
+      if (!providerId) {
+        showSnackbar("Search for a provider to start verifying");
+        return;
+      }
+      // To start verifications in frontend, you should create verification requests at backend and
+      // send the reclaim json string to frontend
+      const request =
+        await YourBackendUsingReclaim.createVerificationRequest(providerId);
+
+      // For this example, we're navigating to a different page with this request to start verification journey
+      // You don't have to do this encoding at all. We did it just for putting this in query params.
       const encodedRequest = encodeURIComponent(btoa(request));
 
+      // Navigating to /verify page with the request
+      // You should check that page to understand how to re-create reclaim verification request
       navigate(`/verify?request=${encodedRequest}`);
     } catch (error) {
       console.error(error);

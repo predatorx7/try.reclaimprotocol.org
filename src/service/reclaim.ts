@@ -1,6 +1,10 @@
-import { ReclaimProofRequest } from "@reclaimprotocol/js-sdk";
+import {
+  ReclaimProofRequest,
+  verifyProof,
+  type Proof,
+} from "@reclaimprotocol/js-sdk";
 
-export const Reclaim = {
+export const YourBackendUsingReclaim = {
   /**
    * @deprecated This should happen on your backend
    *
@@ -18,11 +22,65 @@ export const Reclaim = {
 
     return proofRequest.toJsonString();
   },
-  restoreVerificationRequest: async (encodedRequest: string) => {
-    const requestJsonString = atob(encodedRequest);
-    const proofRequest =
-      await ReclaimProofRequest.fromJsonString(requestJsonString);
 
-    return proofRequest;
+  getProofsAsArray: (proof: Proof | Proof[] | string): Proof[] => {
+    // In most cases, you'll either get a single proof or an array of proofs
+    //
+    // Note: Apologies for making this complicated, we had to do it to stay
+    // backwards compatible with servers using older versions of Reclaim.
+    if (Array.isArray(proof)) {
+      return proof;
+    } else if (typeof proof === "string") {
+      // For backwards compatibility
+      return JSON.parse(proof);
+    } else {
+      // For backwards compatibility
+      return [proof as Proof];
+    }
+  },
+
+  validateProof: async (proofs: Proof[]): Promise<boolean> => {
+    // Validate proof to check if this is what you expected including
+    // request validation and business requirment checks
+    return proofs.length > 0;
+  },
+
+  /**
+   * @deprecated This should happen on your backend
+   *
+   * @param proof
+   */
+  processProof: async (proof: string | Proof | Proof[]): Promise<Proof[]> => {
+    const proofs = YourBackendUsingReclaim.getProofsAsArray(proof);
+
+    // As best practice, you MUST verify proof using `verifyProof` from `import { verifyProof } from "@reclaimprotocol/js-sdk"`
+    // This should happen on your backend.
+    //
+    // This can also throw when proof verification fails.
+    const isProofVerified = await verifyProof(proofs);
+
+    if (!isProofVerified) {
+      // Do not use proof which cannot be verified.
+      // This can happen when there were transport problems, data was incorrect,
+      // some service was down, or someone faked the proof.
+      throw new Error("Proof could not be verified");
+    }
+
+    // As best practice, you MUST validate proofs as per expectations and business requirements.
+    // This should happen on your backend.
+    //
+    // This must be done to make sure that
+    // this is the proof you expected.
+    //
+    // As an example, validation can be done by checking request url, headers,
+    // method, and all proven fields (aka extracted params), etc.
+    const isProofValid = await YourBackendUsingReclaim.validateProof(proofs);
+
+    if (!isProofValid) {
+      // Do not use proof that failed your validation.
+      throw new Error("Proof could not be validated");
+    }
+
+    return proofs;
   },
 };

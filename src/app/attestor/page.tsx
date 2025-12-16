@@ -17,9 +17,7 @@ function Page() {
           <EvaluatorSection title="XML Path Evaluation" />
           <ClaimRequestSection />
         </div>
-
       </div>
-
     </>
   );
 }

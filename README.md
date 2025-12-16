@@ -1,75 +1,84 @@
-# React + TypeScript + Vite
+# Reclaim SDK Demo Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Live Demo:** [https://www.try.reclaimprotocol.org/](https://www.try.reclaimprotocol.org/)
 
-Currently, two official plugins are available:
+This demonstrates the integration of Reclaim Protocol's JS SDK for managing user data providers and verifications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
 
-## React Compiler
+- Node.js
+- A Reclaim Developer account (get it from [dev.reclaimprotocol.org](https://dev.reclaimprotocol.org))
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Setup Instructions
 
-Note: This will impact Vite dev & build performances.
+1. **Get Your API Credentials**
+   - Visit [dev.reclaimprotocol.org](https://dev.reclaimprotocol.org)
+   - Create a new application or use an existing one
+   - Copy your App ID and App Secret
 
-## Expanding the ESLint configuration
+2. **Configure Environment Variables**
+   Rename the existing `.env.example` file in the root directory to `.env`:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+   ```bash
+   mv .env.example .env
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+   Then, open the `.env` file and fill in your credentials:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+   ```
+   VITE_RECLAIM_APP_ID=your_app_id_here
+   VITE_RECLAIM_APP_SECRET=your_app_secret_here
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+3. **Install Dependencies**
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+   ```bash
+   npm install
+   ```
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+4. **Configure Providers**
+   - Open `src/screens/Desktop/Desktop.tsx`
+   - Update the `dataSources` array with your provider IDs from the Reclaim Developer Portal
+   - Each data source should have:
+     - `name`: Display name for the data source
+     - `icon`: Icon component or image
+     - `providerId`: Your provider ID from the Reclaim Developer Portal
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+5. **Run the Development Server**
+
+   ```bash
+   npm run dev
+   ```
+
+   The application will be available at [http://localhost:5173](http://localhost:5173)
+
+6. **Build for Production**
+   ```bash
+   npm run build
+   ```
+
+## Available Data Sources
+
+The project includes several pre-configured data sources:
+
+- X (Twitter) user profile
+- Coinbase KYC
+- GitHub username
+- Gmail Account
+- YouTube Creator Analytics
+- Steam Counter Strike Inventory
+- LinkedIn user profile
+- Amazon Last 2 order details
+- Swiggy Order analytics
+- Zomato Order analytics
+- Flipkart Order history
+- Spotify user-artist overview
+- LinkedIn verifications
+
+## Support
+
+For any issues or questions, please visit the [Reclaim Protocol Documentation](https://docs.reclaimprotocol.org) or contact support.
+
+## License
+
+MIT License

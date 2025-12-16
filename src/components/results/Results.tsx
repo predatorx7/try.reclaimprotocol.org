@@ -6,6 +6,26 @@ import {
   isValueCollection,
 } from "../../utils/format_params";
 
+type ProofRecord = { key: string; value: string };
+
+const collectParametersAsSet = (
+  entries: (Record<string, string> | undefined)[],
+): Set<ProofRecord> => {
+  return (
+    entries
+      // collecting as a set of records because there may be
+      // duplicate keys
+      .reduce<Set<{ key: string; value: string }>>((a, b) => {
+        if (!b) return a;
+
+        return new Set([
+          ...a,
+          ...Object.entries(b).map(([key, value]) => ({ key, value })),
+        ]);
+      }, new Set())
+  );
+};
+
 export default function ResultsView({
   proof,
   className,
@@ -13,39 +33,43 @@ export default function ResultsView({
   proof: Proof[] | null;
   className?: string;
 }) {
-  const extractedParameters = useMemo(() => {
-    if (!proof) return {};
+  const extractedParameters: Set<ProofRecord> = useMemo(() => {
+    if (!proof) return new Set<ProofRecord>();
 
+    // This is how you get a map of string keys and values of
+    // verified data from the proof
     const extractParameters = (o: Proof): Record<string, string> =>
       JSON.parse(o.claimData.context).extractedParameters;
 
-    return proof
-      .map(extractParameters)
-      .reduce<Record<string, string>>((a, b) => {
-        return {
-          ...a,
-          ...b,
-        };
-      }, {});
+    // Collecting all verified data from multiple proofs into one
+    // a single set.
+    // You don't have to do this. Your usecase
+    // may not need collecting all verified data from multiple proofs.
+    // We did it for presentation purposes in this demo.
+    return collectParametersAsSet(proof.map(extractParameters));
   }, [proof]);
 
-  const attachedPublicData = useMemo(() => {
-    if (!proof) return {};
+  const attachedPublicData: Set<ProofRecord> = useMemo(() => {
+    if (!proof) return new Set<ProofRecord>();
 
     const extractPublicData = (o: Proof): Record<string, string> | undefined =>
       o.publicData;
 
-    return proof
-      .map(extractPublicData)
-      .reduce<Record<string, string>>((a, b) => {
-        return {
-          ...a,
-          ...b,
-        };
-      }, {});
+    // Collecting all attached public data from multiple proofs into one
+    // a single set.
+    // You don't have to do this. Your usecase
+    // may not need collecting all attached public data from multiple proofs.
+    // We did it for presentation purposes in this demo.
+    return collectParametersAsSet([
+      // Taking only the first entry that is not null or undefined.
+      // Right now, all public data attached in every proof is exactly the same.
+      proof.map(extractPublicData).find((o) => !!o),
+    ]);
   }, [proof]);
 
   if (!proof) return null;
+
+  // Everything below is just for presentation
 
   return (
     <div className={className}>
@@ -265,25 +289,29 @@ const CompletedIcon = () => {
     </svg>
   );
 };
+
 const SharedDataDisplay = ({
   extractedParameters,
   attachedPublicData,
 }: {
-  extractedParameters: Record<string, string>;
-  attachedPublicData: Record<string, string>;
+  extractedParameters: Set<ProofRecord>;
+  attachedPublicData: Set<ProofRecord>;
 }) => {
+  const extractedParametersArray = Array.from(extractedParameters);
+  const attachedPublicDataArray = Array.from(attachedPublicData);
+
   return (
     <div className="flex-1 px-4 pb-4 overflow-y-auto min-h-[180px] max-h-[25vh] max-w-[30vh]">
       <div className="flex flex-col">
         <div className="space-y-3">
           <div className="space-y-3 pr-2">
-            {Object.entries(extractedParameters).map(([key, value]) => (
+            {extractedParametersArray.map(({ key, value }) => (
               <ParameterEntry key={key} paramKey={key} value={value} />
             ))}
           </div>
         </div>
 
-        {attachedPublicData && Object.entries(attachedPublicData).length > 0 ? (
+        {attachedPublicDataArray && attachedPublicDataArray.length > 0 ? (
           <>
             <div className="mt-2 pt-2 border-t border-gray-300">
               <p className="flex items-center gap-1 text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
@@ -300,7 +328,7 @@ const SharedDataDisplay = ({
                 More
               </p>
               <div className="space-y-3 max-h-[20vh] overflow-y-auto pr-2">
-                {Object.entries(attachedPublicData).map(([key, value]) => (
+                {attachedPublicDataArray.map(({ key, value }) => (
                   <div key={key} className="flex items-start gap-3">
                     <CompletedIcon />
                     <div className="flex-1 min-w-0">

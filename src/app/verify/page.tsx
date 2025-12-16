@@ -1,14 +1,14 @@
 import { useSearchParams } from "react-router";
-import wordLogo from "../../assets/word_icon.svg";
 import { useEffect, useState } from "react";
-import { Reclaim } from "../../service/reclaim";
-import type { Proof, ReclaimProofRequest } from "@reclaimprotocol/js-sdk";
+import { YourBackendUsingReclaim } from "../../service/reclaim";
+import { ReclaimProofRequest, type Proof } from "@reclaimprotocol/js-sdk";
 import { showSnackbar } from "../../components/Snackbar";
 import { getErrorMessage } from "../../utils/error_message";
 import ResultsView from "../../components/results/Results";
 import { SessionIdLabel } from "../../components/SessionIdLabel";
 import { ProviderAppInfoTile } from "../../components/ProviderAppInfoTile";
 import { useLiveBackground } from "../../components/LiveBackground";
+import WordLogo from "../../components/logo/WordLogo";
 
 type VerificationStatus = "starting" | "verifying" | "completed" | "error";
 
@@ -16,8 +16,15 @@ function Page() {
   const [status, setStatus] = useState<VerificationStatus>("starting");
   const { setStatus: setStatusLiveBackground } = useLiveBackground();
 
+  // Ignore this section of the code, it's just for demo purposes.
+  // ==== IGNORE START ====
+  useEffect(() => {
+    setStatusLiveBackground(proof ? "success" : "loading");
+  }, [setStatusLiveBackground]);
+  // ==== IGNORE END ====
 
   const [search] = useSearchParams();
+  // Retreiving the base 64 encoded string
   const encodedRequest = search.get("request");
 
   const [proofRequest, setProofRequest] = useState<ReclaimProofRequest | null>(
@@ -29,9 +36,27 @@ function Page() {
   const [applicationId, setApplicationId] = useState<string>("");
   const [providerId, setProviderId] = useState<string>("");
 
+  /**
+   * You can use this on your frontend to create ReclaimProofRequest with a JSON string of proof request received
+   * from backend.
+   *
+   * @param requestJsonString - The JSON string representation of a ReclaimProofRequest
+   * @returns
+   */
+  const restoreVerificationRequest = async (requestJsonString: string) => {
+    const proofRequest =
+      await ReclaimProofRequest.fromJsonString(requestJsonString);
+
+    return proofRequest;
+  };
+
   useEffect(() => {
     if (!encodedRequest) return;
-    Reclaim.restoreVerificationRequest(encodedRequest)
+    // converting the base64 string back to utf8 json string
+    const requestJsonString = atob(encodedRequest);
+
+    // Using the json string to make ReclaimProofRequest with ReclaimProofRequest.fromJsonString
+    restoreVerificationRequest(requestJsonString)
       .then(setProofRequest)
       .catch((error) => {
         console.error(error);
@@ -41,6 +66,8 @@ function Page() {
       });
   }, [encodedRequest]);
 
+  // Simply calling this function will cause reclaim to trigger
+  // the appropriate Reclaim verification flow based on device type and configuration
   const launchReclaimFlow = async (
     proofRequest: ReclaimProofRequest,
   ): Promise<void> => {
@@ -55,23 +82,53 @@ function Page() {
   ): Promise<void> => {
     launchReclaimFlow(proofRequest);
 
+    // If you are not using a custom callback, then you can use this function on your frontend
+    // to receive proofs (or fatal error) when verification is completed
+    //
+    // Incase of custom callbacks, you'll get your proof sent as HTTP POST request to the callback URL.
     proofRequest
       .startSession({
-        onSuccess: (proof) => {
+        // When proof is provided by this SDK callback here, it is already verified.
+        // As best practise, you MUST verify it again using `verifyProof` from `import { verifyProof } from "@reclaimprotocol/js-sdk"`
+        onSuccess: async (proof) => {
           console.info({ proof });
-          showSnackbar(`Verification completed successfully`);
-          if (Array.isArray(proof)) {
-            setProof(proof);
-          } else if (typeof proof === "string") {
-            // For backwards compatibility
-            setProof(JSON.parse(proof));
-          } else {
-            // For backwards compatibility
-            setProof([proof as Proof]);
+
+          if (!proof) {
+            // likely a type issue, shouldn't happen
+            showSnackbar(`Verification returned unexpected result`);
+            return;
           }
-          setStatus("completed");
+
+          // As best practise, you MUST validate the fields in the proof to make sure that
+          // this is the proof you expected.
+          //
+          // As an example, validation can be done by checking request url, headers,
+          // method, proven fields (aka extracted params), etc.
+          showSnackbar(`Verifying result`);
+
+          try {
+            const trustableProof =
+              await YourBackendUsingReclaim.processProof(proof);
+            showSnackbar(`Verification completed successfully`);
+            setProof(trustableProof);
+
+            setStatus("completed");
+            setStatusLiveBackground("success");
+          } catch (error) {
+            console.error(error);
+            showSnackbar(
+              `Something went wrong because ${getErrorMessage(error)}`,
+            );
+
+            setStatus("error");
+            setStatusLiveBackground("error");
+          }
         },
         onError: (error) => {
+          // Well, I know this is an error and we should show this in UI and stop verification..
+          // But users can retry verification. We can assume this
+          // verification has 'failed' if you don't receive a proof after ~10 mins
+          // of starting verification.
           console.error(error);
           showSnackbar(
             `Something went wrong because ${getErrorMessage(error)}`,
@@ -81,8 +138,12 @@ function Page() {
       .catch((error) => {
         console.error("Failed to get session information", error);
         setStatus("error");
+        showSnackbar(`Something went wrong because ${getErrorMessage(error)}`);
       });
 
+    // You can do this when you don't want to use proofRequest.triggerReclaimFlow(),
+    // and want to launch verification in other *custom* ways, like letting your user scan a QR code
+    // or launching this link in a browser.
     proofRequest
       .getRequestUrl()
       .then(setVerificationLink)
@@ -96,48 +157,49 @@ function Page() {
 
   useEffect(() => {
     if (!proofRequest) return;
+
+    // We can start verification journey for user
+    // with a ReclaimProofRequest object.
     startVerificationJourney(proofRequest).catch((error) => {
       console.error(error);
       showSnackbar(
         `Could not request verification because ${getErrorMessage(error)}`,
       );
     });
+
+    // Ignore this section of the code, it's just for demo purposes.
+    // ==== IGNORE START ====
     if ("applicationId" in proofRequest) {
       setApplicationId((proofRequest as any).applicationId);
     }
     if ("providerId" in proofRequest) {
       setProviderId((proofRequest as any).providerId);
     }
+    // ==== IGNORE END ====
   }, [proofRequest]);
-
-  useEffect(() => {
-    setStatusLiveBackground(proof ? 'success' : 'loading');
-  }, [proof, setStatusLiveBackground]);
 
   return (
     <div className="container">
-      <div className="logo-container">
-        <a href="https://reclaimprotocol.org" target="_blank" rel="noreferrer">
-          <img
-            src={wordLogo}
-            alt="Reclaim Protocol"
-            className="logo-icon"
-            style={{ height: "40px", width: "auto" }}
-          />
-        </a>
-      </div>
+      <WordLogo />
 
       <h1 className="main-heading">Reclaim Protocol Demo</h1>
 
+      {/* Ignore this section, just for demo decoration */}
+      {/* ==== IGNORE START ==== */}
       <ProviderAppInfoTile
         applicationId={applicationId}
         providerId={providerId}
       />
+      {/* ==== IGNORE END ==== */}
 
+      {/* You can use session id using `proofRequest.getSessionId()`. You can store it in the DB, or pass it as a query param
+      in callback url to identify reclaim sessions. */}
       <SessionIdLabel
         sessionId={proofRequest ? proofRequest.getSessionId() : "..."}
       />
 
+      {/* Ignore this section, just for demo decoration */}
+      {/* ==== IGNORE START ==== */}
       {proof ? undefined : <StatusMessage status={status} />}
 
       <VerificationActions
@@ -145,9 +207,12 @@ function Page() {
         verificationLink={verificationLink}
         onLaunch={() => proofRequest && launchReclaimFlow(proofRequest)}
       />
+      {/* ==== IGNORE END ==== */}
 
+      {/* Check code of this component to understand how to get data from proof */}
       <ResultsView className="mb-6" proof={proof} />
 
+      {/* Terms and conditions apply */}
       <p className="disclaimer">
         Proofs generated by Reclaim Protocol are secure and private.{" "}
         <a

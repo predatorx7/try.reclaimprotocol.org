@@ -1,26 +1,17 @@
 import { useEffect } from "react";
-import wordLogo from "../assets/word_icon.svg";
 import { useLiveBackground } from "../components/LiveBackground";
 import SelectProviderForVerification from "../components/SelectProviderForVerification/index";
+import WordLogo from "../components/logo/WordLogo";
 
 function Page() {
   const { setStatus } = useLiveBackground();
   useEffect(() => {
-    setStatus('idle');
+    setStatus("idle");
   }, [setStatus]);
 
   return (
     <div className="container">
-      <div className="logo-container">
-        <a href="https://reclaimprotocol.org" target="_blank" rel="noreferrer">
-          <img
-            src={wordLogo}
-            alt="Reclaim Protocol"
-            className="logo-icon"
-            style={{ height: "40px", width: "auto" }}
-          />
-        </a>
-      </div>
+      <WordLogo />
 
       <h1 className="main-heading">Reclaim Protocol Demo</h1>
 
