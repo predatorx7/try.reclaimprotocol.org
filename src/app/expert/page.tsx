@@ -115,8 +115,24 @@ function Page() {
       <div
         className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
       >
+        <div className="setting-title">Share Page URL</div>
+        <div className="setting-desc">
+          URL to the page which decides where verification should happen.
+        </div>
+        <input
+          type="text"
+          className="input-tile"
+          placeholder="Enter Share Page URL"
+          value={settings.sharePageUrl}
+          onChange={(e) => updateSettings({ sharePageUrl: e.target.value })}
+        />
+      </div>
+
+      <div
+        className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
+      >
         <div className="setting-title">Provider Version</div>
-        <div className="setting-desc">Specific provider version to use.</div>
+        <div className="setting-desc">Specific provider version to use. Leaving this blank will use the latest version.</div>
         <input
           type="text"
           className="input-tile"
@@ -151,22 +167,6 @@ function Page() {
           placeholder="Enter App Secret"
           value={settings.appSecret}
           onChange={(e) => updateSettings({ appSecret: e.target.value })}
-        />
-      </div>
-
-      <div
-        className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
-      >
-        <div className="setting-title">Share Page URL</div>
-        <div className="setting-desc">
-          URL to the page which decides where verification should happen.
-        </div>
-        <input
-          type="text"
-          className="input-tile"
-          placeholder="Enter Share Page URL"
-          value={settings.sharePageUrl}
-          onChange={(e) => updateSettings({ sharePageUrl: e.target.value })}
         />
       </div>
 
