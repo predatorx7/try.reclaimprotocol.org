@@ -59,6 +59,23 @@ function Page() {
       <div
         className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
       >
+        <div className="setting-title">Auto Trigger Flow</div>
+        <div className="setting-desc">Starts the flow automatically when the verify page loads (applies to this demo only).</div>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={settings.autoTriggerFlow}
+            onChange={(e) =>
+              updateSettings({ autoTriggerFlow: e.target.checked })
+            }
+          />
+          <span className="slider"></span>
+        </label>
+      </div>
+
+      <div
+        className={`settings-card ${!settings.isExpertModeEnabled ? "disabled" : ""}`}
+      >
         <div className="setting-title">Callback URL</div>
         <div className="setting-desc">URL to receive proof callbacks.</div>
         <input
@@ -169,6 +186,8 @@ function Page() {
           onChange={(e) => updateSettings({ appSecret: e.target.value })}
         />
       </div>
+
+      <div className="mb-10"></div>
 
       <div className="save-btn-container">
         <button className="btn-primary" onClick={handleSave}>

@@ -15,6 +15,7 @@ interface ExpertContextType {
 
 const defaultSettings: ExpertSettings = {
   isExpertModeEnabled: false,
+  autoTriggerFlow: true,
   callbackUrl: "",
   parameters: "",
   context: "",
